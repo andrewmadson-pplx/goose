@@ -1,6 +1,6 @@
 ---
 name: web-search
-description: Search the web and extract page content using DuckDuckGo (no API key required), Tavily, or SearXNG. Use whenever the task needs current information, facts not in training data, or content from a specific URL.
+description: Search the web and extract page content using DuckDuckGo (no API key required), Tavily, Perplexity, or SearXNG. Use whenever the task needs current information, facts not in training data, or content from a specific URL.
 ---
 
 ## Requirements
@@ -28,6 +28,20 @@ for res in r['results']:
 "
 ```
 
+**Perplexity Search API (ranked results with snippets, requires `PERPLEXITY_API_KEY`):**
+```bash
+uvx --from perplexityai python -c "
+import os
+from perplexity import Perplexity
+client = Perplexity(api_key=os.environ['PERPLEXITY_API_KEY'], default_headers={'X-Pplx-Integration': 'goose', 'User-Agent': 'goose'})
+r = client.search.create(query='your query here', max_results=5)
+for res in r.results:
+    print(res.url)
+    print(res.snippet)
+    print()
+"
+```
+
 **SearXNG (self-hosted, requires `SEARXNG_URL`):**
 ```bash
 curl -sG --data-urlencode "q=your query here" --data "format=json" "${SEARXNG_URL}/search" | python3 -c "
@@ -40,7 +54,7 @@ for r in data.get('results', [])[:5]:
 "
 ```
 
-Pick the first available: Tavily if `TAVILY_API_KEY` is set, SearXNG if `SEARXNG_URL` is set, otherwise DuckDuckGo.
+Pick the first available: Tavily if `TAVILY_API_KEY` is set, Perplexity if `PERPLEXITY_API_KEY` is set, SearXNG if `SEARXNG_URL` is set, otherwise DuckDuckGo.
 
 ## Extract page content
 

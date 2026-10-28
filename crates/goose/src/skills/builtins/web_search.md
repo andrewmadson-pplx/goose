@@ -31,16 +31,19 @@ for res in r['results']:
 **Perplexity Search API (ranked results with snippets, requires `PERPLEXITY_API_KEY`):**
 ```bash
 uvx --from perplexityai python -c "
-import os
-from perplexity import Perplexity
-client = Perplexity(api_key=os.environ['PERPLEXITY_API_KEY'], default_headers={'X-Pplx-Integration': 'goose', 'User-Agent': 'goose'})
-r = client.search.create(query='your query here', max_results=5)
+import os, sys
+from perplexity import Perplexity, __version__
+client = Perplexity(api_key=os.environ['PERPLEXITY_API_KEY'], timeout=60, default_headers={'X-Pplx-Integration': 'goose', 'User-Agent': f'goose (Perplexity/Python {__version__})'})
+r = client.search.create(query=sys.stdin.read().strip(), max_results=5)
 for res in r.results:
     print(res.url)
-    print(res.snippet)
+    print(res.snippet or '')
     print()
-"
+" <<'QUERY'
+your query here
+QUERY
 ```
+The query is read from stdin, so quotes, `$`, and backticks in it are passed through unchanged.
 
 **SearXNG (self-hosted, requires `SEARXNG_URL`):**
 ```bash

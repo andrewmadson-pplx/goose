@@ -2049,6 +2049,44 @@ mod tests {
         assert!(cerebras_config().preserves_thinking);
     }
 
+    fn perplexity_config() -> DeclarativeProviderConfig {
+        crate::declarative::fixed_provider_configs()
+            .expect("bundled providers should load")
+            .into_iter()
+            .find(|config| config.name == "perplexity")
+            .expect("perplexity should be bundled")
+    }
+
+    #[test]
+    fn perplexity_requests_sonar_endpoint() {
+        struct StaticKeyResolver;
+        impl KeyResolver for StaticKeyResolver {
+            type Error = std::convert::Infallible;
+
+            fn resolve_key(&self, _key: &str) -> std::result::Result<String, Self::Error> {
+                Ok("test-key".to_string())
+            }
+        }
+
+        let provider = from_declarative_config(perplexity_config(), None, StaticKeyResolver)
+            .expect("perplexity config should build a provider")
+            .build();
+
+        assert_eq!(
+            format!("{}/{}", provider.api_client.host(), provider.base_path),
+            "https://api.perplexity.ai/v1/sonar"
+        );
+    }
+
+    #[test]
+    fn perplexity_uses_static_model_list() {
+        let config = perplexity_config();
+
+        assert_eq!(config.dynamic_models, Some(false));
+        let names: Vec<&str> = config.models.iter().map(|m| m.name.as_str()).collect();
+        assert_eq!(names, ["sonar", "sonar-pro", "sonar-reasoning-pro"]);
+    }
+
     #[test]
     fn apply_declared_request_params_skips_reserved_keys() {
         let mut payload = json!({

@@ -5,12 +5,13 @@
   "description": "Chat models with built-in real-time web search grounding",
   "api_key_env": "PERPLEXITY_API_KEY",
   "base_url": "https://api.perplexity.ai",
+  "base_path": "v1/sonar",
   "models": [
     { "name": "sonar", "context_limit": 128000 },
     { "name": "sonar-pro", "context_limit": 128000 },
-    { "name": "sonar-reasoning", "context_limit": 128000 },
     { "name": "sonar-reasoning-pro", "context_limit": 128000 }
   ],
+  "dynamic_models": false,
   "supports_streaming": true,
   "model_doc_link": "https://docs.perplexity.ai/docs/getting-started",
   "setup_steps": [
